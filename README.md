@@ -23,5 +23,5 @@ Audio files are processed through the following pipeline:
 - Apache Kafka
 - External bird classification API
 
-## Project Structure
+
 
