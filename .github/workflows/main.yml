@@ -1,0 +1,33 @@
+name: BirdPipe Pipeline (Manual Run)
+
+on:
+  workflow_dispatch:
+    inputs:
+      min_score:
+        description: "Confidence threshold for report"
+        required: false
+        default: "0.3"
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install snakemake pymongo python-dotenv minio requests pandas matplotlib
+
+      - name: Run pipeline (Snakemake)
+        env:
+          POSITIVE_THRESHOLD: ${{ github.event.inputs.min_score }}
+        run: |
+          snakemake -n
