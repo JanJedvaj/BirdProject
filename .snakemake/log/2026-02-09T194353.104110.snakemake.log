@@ -1,0 +1,44 @@
+Assuming unrestricted shared filesystem usage.
+host: DESKTOP-N9V5141
+Building DAG of jobs...
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job                count
+---------------  -------
+all                    1
+classify_audio         1
+generate_report        1
+healthcheck            1
+upload_audio           1
+total                  5
+
+Select jobs to execute...
+Execute 1 jobs...
+[Mon Feb  9 19:43:53 2026]
+localrule healthcheck:
+    output: out/.pipeline/healthcheck.ok
+    jobid: 1
+    reason: Missing output files: out/.pipeline/healthcheck.ok
+    resources: tmpdir=C:\Users\Jan\AppData\Local\Temp
+Waiting at most 5 seconds for missing files:
+out/.pipeline/healthcheck.ok (missing locally)
+MissingOutputException in rule healthcheck in file "C:\Users\Jan\birdpipe-observation-pipeline\Snakefile", line 20:
+Job 1  completed successfully, but some output files are missing. Missing files after 5 seconds. This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait:
+out/.pipeline/healthcheck.ok (missing locally, parent dir contents: )
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look below for error messages
+[Mon Feb  9 19:43:59 2026]
+Error in rule healthcheck:
+    message: None
+    jobid: 1
+    output: out/.pipeline/healthcheck.ok
+    shell:
+        
+        python src/healthcheck_services.py
+        python -c "open(r'out/.pipeline/healthcheck.ok', 'w', encoding='utf-8').write('ok\n')"
+        
+        (command exited with non-zero exit code)
+Complete log(s): C:\Users\Jan\birdpipe-observation-pipeline\.snakemake\log\2026-02-09T194353.104110.snakemake.log
+WorkflowError:
+At least one job did not complete successfully.
