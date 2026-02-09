@@ -141,7 +141,7 @@ def main() -> int:
     max_seconds = int(os.getenv("KAFKA_MAX_SECONDS", "8"))
     timeout_ms = int(os.getenv("KAFKA_TIMEOUT_MS", "5000"))
 
-    print(f"📥 Ingest starting via Docker consumer (container={KAFKA_CONTAINER}, topic={topic})")
+    print(f" Ingest starting via Docker consumer (container={KAFKA_CONTAINER}, topic={topic})")
 
     try:
         ensure_docker_and_container()
@@ -165,7 +165,7 @@ def main() -> int:
                 continue
             filtered.append(ln)
 
-        print(f"🧾 Kafka output lines collected: {len(filtered)}")
+        print(f" Kafka output lines collected: {len(filtered)}")
 
         ingested = 0
         for i, line in enumerate(filtered):
@@ -190,15 +190,15 @@ def main() -> int:
             )
             ingested += 1
 
-        print(f"✅ Ingest done. Mongo upsert attempts: {ingested}")
-        print("ℹ️  Data stored in Mongo collection: field_observations")
+        print(f" Ingest done. Mongo upsert attempts: {ingested}")
+        print(" Data stored in Mongo collection: field_observations")
         return 0
 
     except PyMongoError as ex:
-        print(f"❌ Mongo error: {ex}", file=sys.stderr)
+        print(f" Mongo error: {ex}", file=sys.stderr)
         return 1
     except Exception as ex:
-        print(f"❌ Ingest failed: {ex}", file=sys.stderr)
+        print(f" Ingest failed: {ex}", file=sys.stderr)
         return 1
 
 
