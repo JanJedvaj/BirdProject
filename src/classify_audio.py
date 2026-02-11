@@ -78,7 +78,7 @@ def main() -> int:
 
         # audio list
         audios = list(audio_col.find({}))
-        print(f"🎧 Found {len(audios)} uploaded audio entries in Mongo (audio_files)")
+        print(f"Found {len(audios)} uploaded audio entries in Mongo (audio_files)")
 
         processed = 0
         skipped = 0
@@ -90,9 +90,8 @@ def main() -> int:
             lat = a.get("lat")
             lon = a.get("lon")
 
-            # skip if already classified
             if cls_col.find_one({"audio_id": audio_id}, {"_id": 1}):
-                print(f"↩️  Skip {filename} (already classified)")
+                print(f"Skip {filename} (already classified)")
                 skipped += 1
                 continue
 
@@ -103,12 +102,11 @@ def main() -> int:
                 obj.close()
                 obj.release_conn()
             except S3Error as ex:
-                print(f"❌ MinIO get_object failed for {object_name}: {ex}", file=sys.stderr)
+                print(f"MinIO get_object failed for {object_name}: {ex}", file=sys.stderr)
                 continue
 
             # 2) call classify API
             files = {
-                # common pattern: file field name is usually "file"
                 "file": (filename, BytesIO(data), "application/octet-stream")
             }
 
@@ -156,15 +154,12 @@ def main() -> int:
                     content_type="application/json",
                 )
             except S3Error as ex:
-                print(f"⚠️  Could not store log in MinIO ({log_key}): {ex}", file=sys.stderr)
+                print(f"Could not store log in MinIO ({log_key}): {ex}", file=sys.stderr)
 
             # 4) normalize + save result in Mongo
-            # We don't know exact API schema; we try common shapes.
             best_label: Optional[str] = None
             best_score: Optional[float] = None
 
-            # common schema guesses
-            # - {"best": {"label": "...", "score": 0.9}}
             if isinstance(parsed, dict):
                 b = parsed.get("best")
                 if isinstance(b, dict):
@@ -174,7 +169,6 @@ def main() -> int:
                     except Exception:
                         best_score = None
 
-                # - {"predictions":[{"label":"...", "score":...}, ...]}
                 if best_label is None:
                     preds = parsed.get("predictions") or parsed.get("results")
                     if isinstance(preds, list) and preds:
@@ -186,7 +180,7 @@ def main() -> int:
                             except Exception:
                                 best_score = None
 
-            # taxonomy link (best effort)
+            # taxonomy link 
             taxon_doc = None
             if best_label:
                 taxon_doc = taxa_col.find_one({"taxon_code": best_label}, {"_id": 0, "latin_name": 1, "common_name": 1})
@@ -204,19 +198,19 @@ def main() -> int:
                     "http": response_meta,
                     "best_label": best_label,
                     "best_score": best_score,
-                    "taxonomy": taxon_doc,  # may be None
+                    "taxonomy": taxon_doc,  
                     "raw": parsed,
                 }
             )
 
-            print(f"✅ Classified {filename} -> best={best_label} score={best_score} (log={log_key})")
+            print(f"Classified {filename} -> best={best_label} score={best_score} (log={log_key})")
             processed += 1
 
-        print(f"✅ Classification finished. processed={processed}, skipped={skipped}")
+        print(f"Classification finished. processed={processed}, skipped={skipped}")
         return 0
 
     except (PyMongoError, RuntimeError) as ex:
-        print(f"❌ classify_audio failed: {ex}", file=sys.stderr)
+        print(f"classify_audio failed: {ex}", file=sys.stderr)
         return 1
 
 

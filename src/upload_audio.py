@@ -72,7 +72,7 @@ def main() -> int:
 
     # 3) scan files
     files = [p for p in audio_dir.iterdir() if p.is_file() and p.suffix.lower() in (".wav", ".mp3")]
-    print(f"🎧 Found {len(files)} audio files in {audio_dir}")
+    print(f"Found {len(files)} audio files in {audio_dir}")
 
     uploaded = 0
     skipped = 0
@@ -83,7 +83,7 @@ def main() -> int:
         object_name = f"audio/{audio_id}{ext}"
 
         if col.find_one({"audio_id": audio_id}):
-            print(f"↩️  Skip {p.name} (already in Mongo)")
+            print(f"Skip {p.name} (already in Mongo)")
             skipped += 1
             continue
 
@@ -108,10 +108,10 @@ def main() -> int:
         }
 
         col.insert_one(doc)
-        print(f"✅ Uploaded {p.name} -> s3://{bucket}/{object_name}")
+        print(f"Uploaded {p.name} -> s3://{bucket}/{object_name}")
         uploaded += 1
 
-    print(f"✅ Audio upload finished. uploaded={uploaded}, skipped={skipped}")
+    print(f"Audio upload finished. uploaded={uploaded}, skipped={skipped}")
     return 0
 
 

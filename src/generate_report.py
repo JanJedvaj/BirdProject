@@ -159,7 +159,7 @@ def main() -> int:
             if audio_id:
                 seen_audio_per_species[species_key].add(str(audio_id))
 
-    # Only species with at least one positive segment (PDF: at least one positive classification)
+    # Only species with at least one positive segment 
     rows: List[Dict[str, Any]] = []
     for species_key, e in agg.items():
         if e["positive_segments"] <= 0:
@@ -168,8 +168,6 @@ def main() -> int:
         avg_conf = (e["confidence_sum"] / e["confidence_n"]) if e["confidence_n"] else 0.0
 
         # "Relevant observation data" from Kafka observations:
-        # we try to match observations by taxon_code (often won't match),
-        # so we keep it but it's ok if 0.
         obs_count = 0
         # Attempt: taxon_code == species_key (rare) or taxon_code == label
         obs_count = obs_col.count_documents({"taxon_code": species_key})
@@ -200,7 +198,6 @@ def main() -> int:
         r["scientific_name"] = r["scientific_name"].strip()
         r["common_name"] = r["common_name"].strip()
 
-    # Optional fuzzy filter
     if args.species:
         query = args.species
         candidates = []
@@ -247,7 +244,7 @@ def main() -> int:
         for r in rows:
             w.writerow(r)
 
-    print(f"✅ CSV generated: {out_path}")
+    print(f"CSV generated: {out_path}")
     print(f"Rows: {len(rows)} | threshold={threshold} | fuzzy={'ON' if args.species else 'OFF'}")
     return 0
 
